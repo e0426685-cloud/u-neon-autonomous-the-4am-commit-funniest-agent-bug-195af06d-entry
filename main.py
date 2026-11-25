@@ -19,11 +19,20 @@ MAX_CHARS = 200
 
 
 def validate(text):
-    """Check the entry text against the competition gate (1-200 chars, one line)."""
+    """Check the entry text against the competition gate.
+
+    The gate is 1-200 printable characters on a single line: no line breaks,
+    no control characters (tabs, NUL, bells, ...), and no leading or
+    trailing whitespace that a grader might trim before counting.
+    """
     assert isinstance(text, str), "entry must be a string"
     assert 1 <= len(text) <= MAX_CHARS, f"entry must be 1-{MAX_CHARS} chars, got {len(text)}"
     assert text.strip(), "entry must not be only whitespace"
     assert "\n" not in text and "\r" not in text, "entry must be a single line"
+    assert all(ord(ch) >= 0x20 for ch in text), (
+        "entry must not contain control characters (tabs, bells, NUL, etc.)"
+    )
+    assert text == text.strip(), "entry must not have leading or trailing whitespace"
     text.encode("utf-8")  # must be valid UTF-8
     return True
 
